@@ -1,14 +1,14 @@
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
-  name: my-custom-image-build
-  namespace: airflow-prod-ssa-eda
+  name: ml-image-containerfile
+  namespace: containerfile-test
 spec:
   nodeSelector: null
   output:
     to:
       kind: ImageStreamTag
-      name: 'ml-image:latest'
+      name: 'ml-image-containerfile:latest'
   resources:
     requests:
       cpu: "500m"
@@ -16,12 +16,9 @@ spec:
   successfulBuildsHistoryLimit: 5
   failedBuildsHistoryLimit: 5
   strategy:
-    type: Source
-    sourceStrategy:
-      from:
-        kind: ImageStreamTag
-        namespace: openshift
-        name: 'python:3.8-ubi8'
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: "Containerfile"
       env:
         - name: GIT_SSL_NO_VERIFY
           value: 'true'
@@ -31,10 +28,8 @@ spec:
   source:
     type: Git
     git:
-      uri: 'https://github.com/noahsa/ml-container-buildconfig.git'
+      uri: 'https://github.com/noahsa/ml-containerfile.git'
       ref: main
-    sourceSecret:
-      name: custom-image-deploy-token
   triggers:
     - type: ImageChange
     - type: ConfigChange
