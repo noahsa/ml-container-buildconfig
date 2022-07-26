@@ -1,0 +1,36 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: ml-image-containerfile
+  namespace: containerfile-test
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'ml-image-containerfile:latest'
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: "Containerfile"
+      env:
+        - name: GIT_SSL_NO_VERIFY
+          value: 'true'
+        - name: ENABLE_MICROPIPENV
+          value: '1'
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/noahsa/ml-containerfile.git'
+      ref: main
+  triggers:
+    - type: ImageChange
+    - type: ConfigChange
+  runPolicy: Serial
